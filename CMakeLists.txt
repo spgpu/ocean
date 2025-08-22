@@ -11,12 +11,15 @@ target_include_directories(glad PUBLIC lib/glad/include)
 # GLFW
 add_subdirectory(lib/glfw-3.4)
 
+# OpenGL
+find_package(OpenGL REQUIRED)
+
 # Create executable
 add_executable(ocean src/main.cpp)
-target_link_libraries(ocean PRIVATE glfw glad)
 
-# Extra system libs on Linux
-if(UNIX AND NOT APPLE)
-  find_package(OpenGL REQUIRED)
-  target_link_libraries(ocean PRIVATE OpenGL::GL X11 Xrandr Xinerama Xi Xcursor dl pthread)
-endif()
+# OS agnostic dependencies
+target_link_libraries(ocean PRIVATE 
+    glfw 
+    glad
+    OpenGL::GL
+)
