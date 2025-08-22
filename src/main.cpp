@@ -36,9 +36,52 @@ int main() {
     };
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    /***************************/
+
+    const char *vshaderSource =
+        "#version 430 \n"
+        "void main(void) \n"
+        "{ gl_Position = vec4(0.0, 0.0, 0.0, 1.0); }";
+
+    const char *fshaderSource =
+        "#version 430 \n"
+        "out vec4 color; \n"
+        "void main(void) \n"
+        "{ color = vec4(1.0, 0.0, 0.0, 1.0); }";
+
+    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vShader, 1, &vshaderSource, NULL);
+    glCompileShader(vShader);
+    
+    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fShader, 1, &fshaderSource, NULL);
+    glCompileShader(fShader);    
+
+    GLuint vfProgram = glCreateProgram();
+    glAttachShader(vfProgram, vShader);
+    glAttachShader(vfProgram, fShader);
+    glLinkProgram(vfProgram);
+        
+    /***************************/
+
+    GLuint vao[1];
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(vao[0]);
     
     // Rendering loop
     while(!glfwWindowShouldClose(window)) {
+
+        // This could be a function handling all keys.
+        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+        
+        glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(vfProgram);
+        glDrawArrays(GL_POINTS, 0, 1);
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
